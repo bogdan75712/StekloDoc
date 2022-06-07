@@ -1,0 +1,256 @@
+Windows
+
+GetDataByWindow
+
+SELECT IDWindow, Cost, IDColor, IDManufacturer, Width, Height, IDCategory, IDWindowType, IDWindowSill, IDProfileType, IDHomeType, IDGlazingType, IDLeftSash, IDRigthSash, IDMediumSash FROM Windows WHERE (IDColor = @idcolor) AND (Width = @width) AND (Height = @height) AND (IDWindowType = @idwindowtype) AND (IDWindowSill = @idsill) AND (IDProfileType = @idprofiletype) AND (IDHomeType = @idhometype) AND (IDGlazingType = @idglazingtype) AND (IDLeftSash = @idleftsash) AND (IDRigthSash = @idrightsash) AND (IDMediumSash = @idmediumsash)
+
+InsertWindow
+
+INSERT INTO Windows
+                (IDWindow, Cost, IDColor, IDManufacturer, Width, Height, IDCategory, IDWindowType, IDWindowSill, IDProfileType, IDHomeType, IDGlazingType, IDLeftSash, IDRigthSash, IDMediumSash)
+VALUES   (@IDWindow,@Cost,@IDColor,@IDManufacturer,@Width,@Height,@IDCategory,@IDWindowType,@IDWindowSill,@IDProfileType,@IDHomeType,@IDGlazingType,@IDLeftSash,@IDRigthSash,@IDMediumSash);  
+
+
+
+SelectHeight
+
+SELECT Height FROM Windows WHERE (IDHomeType = @idhometype) AND (IDWindowType = @idwindowtype)
+
+SelectWidth
+
+SELECT Width FROM Windows WHERE (IDHomeType = @idhometype) AND (IDWindowType = @idwindowtype)
+
+SelectLastID
+
+SELECT   MAX(IDWindow) AS LastID
+FROM      Windows
+
+Orders
+
+InsertOrder
+
+INSERT INTO [dbo].[Orders] ([IDOrder], [IDClient], [Cost], [Sale], [Montage], [Demontage], [OrderDate], [OrderPerformDate], [IDUser]) VALUES (@IDOrder, @IDClient, @Cost, @Sale, @Montage, @Demontage, @OrderDate, @OrderPerformDate, @IDUser);
+
+
+SelctLastID
+
+SELECT   MAX(IDOrder) AS LastID
+FROM      Orders
+
+
+Client
+
+GetDataByClient
+
+SELECT  FIO, Phone, Address FROM dbo.Client
+Where (IDClient = @idClient)
+
+InsertClient
+
+INSERT INTO Client
+                (FIO, Phone, Address)
+VALUES   (@FIO,@Phone,@Address); 
+
+
+Users
+
+GetDataByManagers
+
+SELECT   IDUser, Login, Password
+FROM      Users
+WHERE   (IDRole = 2)
+
+GetDataByManager
+
+SELECT IDUser, Login, Password, IDRole FROM dbo.Users
+Where (Login =@login) and (Password =@pass)
+
+InsertManager
+
+INSERT INTO Users
+                (IDUser, Login, Password, IDRole)
+VALUES   (@IDUser,@Login,@Password,@IDRole); 
+SELECT IDUser, Login, Password, IDRole FROM Users WHERE (IDUser = @IDUser)
+
+SelectLastID
+
+SELECT   MAX(IDUser) AS LastID
+FROM      Users
+
+
+OrderDetail
+
+InsertOrderDetail
+
+INSERT INTO OrderDetail
+                (IDOrder, IDWindow, Count)
+VALUES   (@IDOrder,@IDWindow,@Count); 
+
+
+Colors
+
+SelectIDColor
+
+SELECT IDColor FROM Colors
+Where (Title = @str)
+
+GlazingType
+
+SelectIDGlazingType
+
+SELECT   IDGlazingType
+FROM      GlazingType
+WHERE   (Title = @Title)
+
+HomeType
+
+InsertHomeType
+
+INSERT INTO HomeType
+                (Name, HomeType)
+VALUES   (@Name,@HomeType); 
+
+LeftSash
+
+SelectIDLeft
+
+SELECT IDLeftSash FROM LeftSash
+Where (Title = @str)
+
+ProfileType
+
+SelectManufacturer
+
+SELECT   IDManufacturer
+FROM      ProfileType
+WHERE   (IDProfileType = @profiletype)
+
+SelectProfileID
+
+SELECT IDProfileType FROM ProfileType
+Where (Title = @str)
+
+
+MediumSash
+
+GetDataByMediumSash
+
+SELECT   IDMediumSash, Title
+FROM      MediumSash
+WHERE   (IDMediumSash > 1)
+
+SelectIDMedium
+
+SELECT   IDMediumSash
+FROM      MediumSash
+WHERE   (Title = @str)
+
+WindowSill
+
+SelectIDSill
+
+Select IDWindowSill From WindowSill
+Where (Title = @str)
+
+
+WindowsType
+
+SelectIDWindowType
+
+SELECT IDWindowType FROM WindowsType
+Where (Title =@str)
+
+
+Созданные адаптеры
+
+OrdersCompany
+
+GetData
+
+SELECT   OrderDetail.IDOrderDetail, OrderDetail.IDOrder, OrderDetail.IDWindow, OrderDetail.Count, Orders.IDOrder AS Expr1, Orders.IDClient, Orders.Cost, Orders.Sale, Orders.Montage, Orders.Demontage, Orders.OrderDate, Orders.OrderPerformDate, 
+                Orders.IDUser
+FROM      OrderDetail INNER JOIN
+                Orders ON OrderDetail.IDOrder = Orders.IDOrder
+
+SelectAllCount
+
+SELECT   SUM(Count) AS AllCount
+FROM      OrderDetail
+
+SelectAllOrders
+
+SELECT   COUNT(IDOrder) AS AllOrders
+FROM      Orders
+
+SelectAllSum
+
+SELECT   SUM(Cost) AS AllSum
+FROM      Orders
+
+SelectMonthOrders
+
+SELECT   COUNT(IDOrder) AS AllOrders
+FROM      Orders
+WHERE   (OrderDate > @startDate)
+
+SelectMonthSum
+
+SELECT   SUM(Cost) AS AllSum
+FROM      Orders
+WHERE   (OrderDate > @startDate)
+
+WindowsAll
+
+GetData
+
+SELECT   Windows.IDWindow, WindowsType.Title, GlazingType.Title AS Expr1, ProfileType.Title AS Expr2, Manufacturer.Title AS Expr3, WindowSill.Title AS Expr4, Colors.Title AS Expr5, LeftSash.Title AS Expr6, RightSash.Title AS Expr7, 
+                MediumSash.Title AS Expr8, Windows.Cost
+FROM      RightSash INNER JOIN
+                GlazingType INNER JOIN
+                Colors INNER JOIN
+                ProfileType INNER JOIN
+                Manufacturer ON ProfileType.IDManufacturer = Manufacturer.IDManufacturer INNER JOIN
+                Windows ON ProfileType.IDProfileType = Windows.IDProfileType AND Manufacturer.IDManufacturer = Windows.IDManufacturer INNER JOIN
+                MediumSash ON Windows.IDMediumSash = MediumSash.IDMediumSash ON Colors.IDColor = Windows.IDColor ON GlazingType.IDGlazingType = Windows.IDGlazingType INNER JOIN
+                LeftSash ON Windows.IDLeftSash = LeftSash.IDLeftSash ON RightSash.IDRightSash = Windows.IDRigthSash INNER JOIN
+                WindowSill ON Windows.IDWindowSill = WindowSill.IDWindowSill INNER JOIN
+                WindowsType ON Windows.IDWindowType = WindowsType.IDWindowType
+
+
+OrdersManagers
+
+GetData
+
+SELECT   Users.Login, Orders.IDOrder, Orders.Cost, Orders.OrderDate
+FROM      Orders INNER JOIN
+                Users ON Orders.IDUser = Users.IDUser
+WHERE   (Users.IDUser = @idUser)
+
+GetDataByMonth
+
+SELECT   Users.Login, Orders.IDOrder, Orders.Cost, Orders.OrderDate
+FROM      Orders INNER JOIN
+                Users ON Orders.IDUser = Users.IDUser
+WHERE   (Orders.OrderDate > @startDate) AND (Users.IDUser = @idUser)
+
+
+WindowTypeGlazingTypeProfileType
+
+GetDataMarket
+
+SELECT   WindowsType.Title AS WinType, ProfileType.Title AS profileType, GlazingType.Title AS Glaztype
+FROM      WindowsType CROSS JOIN
+                ProfileType CROSS JOIN
+                GlazingType
+WHERE   (GlazingType.IDGlazingType = @glazingtype) AND (ProfileType.IDProfileType = @idprofiletype) AND (WindowsType.IDWindowType = @idwindowtype)
+
+
+OrdersUsersClient
+
+GetData
+
+SELECT   Orders.IDOrder, Orders.Cost, Orders.Sale, Orders.OrderDate, Orders.OrderPerformDate, Client.FIO, Users.Login
+FROM      Client INNER JOIN
+                Orders ON Client.IDClient = Orders.IDClient INNER JOIN
+                Users ON Orders.IDUser = Users.IDUser
+WHERE   (Orders.IDUser = @idUser)
